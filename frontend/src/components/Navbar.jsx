@@ -1,4 +1,4 @@
-import { Home, FileText, Upload, Settings } from 'lucide-react';
+import { Home, FileText, Upload, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
@@ -21,13 +21,6 @@ const Navbar = () => {
                 Home
               </Link>
               <Link
-                to="/documents"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Documents
-              </Link>
-              <Link
                 to="/upload"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
@@ -35,11 +28,11 @@ const Navbar = () => {
                 Upload
               </Link>
               <Link
-                to="/settings"
+                to="/chat"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
               </Link>
             </div>
           </div>
