@@ -1,36 +1,81 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, File, X, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { uploadDocument, getDocuments, deleteDocument } from '../services/api';
 
 const UploadPage = () => {
   const [files, setFiles] = useState([]);
   const [uploadedDocs, setUploadedDocs] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  const MAX_FILES = 10;
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
   useEffect(() => {
     loadDocuments();
   }, []);
 
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (successMessage || error) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        setError(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, error]);
+
   const loadDocuments = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const docs = await getDocuments();
       setUploadedDocs(docs);
     } catch (error) {
       console.error('Error loading documents:', error);
+      setError(error.message || 'Failed to load documents');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+    // Handle rejected files
+    if (rejectedFiles.length > 0) {
+      const errorMsg = rejectedFiles.map(f => 
+        `${f.file.name}: ${f.errors.map(e => e.message).join(', ')}`
+      ).join('; ');
+      setError(errorMsg);
+      return;
+    }
+
+    // Check max files limit
+    if (files.length + acceptedFiles.length > MAX_FILES) {
+      setError(`Maximum ${MAX_FILES} files allowed`);
+      return;
+    }
+
+    // Validate file sizes
+    const oversizedFiles = acceptedFiles.filter(f => f.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      setError(`Files exceed 50MB limit: ${oversizedFiles.map(f => f.name).join(', ')}`);
+      return;
+    }
+
     const newFiles = acceptedFiles.map(file => ({
       file,
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(), // Use crypto API for unique IDs
       progress: 0,
       status: 'pending', // pending, uploading, success, error
       error: null,
     }));
     setFiles(prev => [...prev, ...newFiles]);
-  }, []);
+    setError(null);
+  }, [files]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -40,6 +85,9 @@ const UploadPage = () => {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
       'text/plain': ['.txt'],
     },
+    maxSize: MAX_FILE_SIZE,
+    maxFiles: MAX_FILES,
+    disabled: uploading,
   });
 
   const removeFile = (fileId) => {
@@ -48,6 +96,9 @@ const UploadPage = () => {
 
   const uploadFiles = async () => {
     setUploading(true);
+    setError(null);
+    let successCount = 0;
+    let errorCount = 0;
     
     for (const fileItem of files) {
       if (fileItem.status === 'success') continue;
@@ -67,27 +118,45 @@ const UploadPage = () => {
         setFiles(prev => prev.map(f => 
           f.id === fileItem.id ? { ...f, status: 'success', progress: 100 } : f
         ));
+        successCount++;
       } catch (error) {
         setFiles(prev => prev.map(f => 
           f.id === fileItem.id ? { 
             ...f, 
             status: 'error', 
-            error: error.response?.data?.detail || 'Upload failed' 
+            error: error.response?.data?.detail || error.message || 'Upload failed' 
           } : f
         ));
+        errorCount++;
       }
     }
 
     setUploading(false);
-    loadDocuments();
+    
+    // Show summary message
+    if (successCount > 0) {
+      setSuccessMessage(`${successCount} file(s) uploaded successfully`);
+    }
+    if (errorCount > 0) {
+      setError(`${errorCount} file(s) failed to upload`);
+    }
+    
+    // Reload documents
+    await loadDocuments();
   };
 
   const handleDeleteDocument = async (docId) => {
+    if (!confirm('Are you sure you want to delete this document?')) {
+      return;
+    }
+
     try {
       await deleteDocument(docId);
+      setSuccessMessage('Document deleted successfully');
       loadDocuments();
     } catch (error) {
       console.error('Error deleting document:', error);
+      setError(error.message || 'Failed to delete document');
     }
   };
 
@@ -98,6 +167,26 @@ const UploadPage = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Upload Documents</h1>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
+          <div className="flex items-center">
+            <CheckCircle className="w-5 h-5 mr-2" />
+            {successMessage}
+          </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+          <div className="flex items-center">
+            <AlertCircle className="w-5 h-5 mr-2" />
+            {error}
+          </div>
+        </div>
+      )}
 
       {/* Dropzone */}
       <div
@@ -201,7 +290,12 @@ const UploadPage = () => {
       {/* Uploaded Documents */}
       <div className="mt-8 bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4">Uploaded Documents</h2>
-        {uploadedDocs.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader className="w-6 h-6 animate-spin text-blue-600" />
+            <span className="ml-2 text-gray-600">Loading documents...</span>
+          </div>
+        ) : uploadedDocs.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No documents uploaded yet</p>
         ) : (
           <div className="space-y-2">
