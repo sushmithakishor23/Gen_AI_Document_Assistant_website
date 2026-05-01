@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Loader, File, Trash2, X, Menu } from 'lucide-react';
+import { Send, Bot, User, Loader, File, Trash2, X, Menu, RotateCcw } from 'lucide-react';
 import { sendMessage, getChatHistory, getDocuments, deleteDocument } from '../services/api';
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
+  const [chatHistory, setChatHistory] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -119,6 +120,13 @@ const Chat = () => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Update chat history with user question and assistant answer
+      setChatHistory(prev => [
+        ...prev,
+        { role: 'user', content: messageContent },
+        { role: 'assistant', content: assistantMessage.content }
+      ]);
     } catch (error) {
       if (error.name === 'AbortError') {
         console.log('Request aborted');
@@ -172,6 +180,14 @@ const Chat = () => {
       console.error('Error deleting document:', error);
       setError(error.message || 'Failed to delete document');
     }
+  };
+
+  const handleNewChat = () => {
+    // Clear chat history and messages
+    setChatHistory([]);
+    setMessages([]);
+    setError(null);
+    setSuccessMessage('New chat started');
   };
 
   return (
@@ -335,6 +351,14 @@ const Chat = () => {
                 )}
               </div>
             </div>
+            <button
+              onClick={handleNewChat}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              title="Start a new chat"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span className="font-medium">New Chat</span>
+            </button>
           </div>
 
           {/* Success Message */}

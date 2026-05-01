@@ -129,4 +129,21 @@ export const getChatHistory = async (documentId = null) => {
   }
 };
 
+// Query document with chat history
+export const queryDocument = async (question, chatHistory = []) => {
+  try {
+    if (!question || !question.trim()) {
+      throw new Error('Question cannot be empty');
+    }
+    const response = await api.post('/query', {
+      question,
+      chat_history: chatHistory,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error querying document:', error);
+    throw error;
+  }
+};
+
 export default api;
