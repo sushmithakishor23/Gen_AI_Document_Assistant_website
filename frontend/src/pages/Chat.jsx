@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Loader, File, Trash2, X, Menu, RotateCcw } from 'lucide-react';
+import { Send, Bot, User, File, Trash2, X, Menu, RotateCcw } from 'lucide-react';
 import { sendMessage, getChatHistory, getDocuments, deleteDocument } from '../services/api';
+import MessageBubble from '../components/MessageBubble';
+import TypingIndicator from '../components/TypingIndicator';
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
@@ -94,7 +96,7 @@ const Chat = () => {
     }
 
     const userMessage = {
-      id: crypto.randomUUID(), // Use crypto API for unique IDs
+      id: crypto.randomUUID(),
       role: 'user',
       content: inputMessage.trim(),
       timestamp: new Date().toISOString(),
@@ -196,21 +198,21 @@ const Chat = () => {
       <div
         className={`${
           sidebarOpen ? 'w-80' : 'w-0'
-        } transition-all duration-300 bg-white rounded-lg shadow-md overflow-hidden flex-shrink-0`}
+        } transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden flex-shrink-0`}
       >
         <div className="h-full flex flex-col">
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold text-gray-900">Documents</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Documents</h2>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="lg:hidden text-gray-500 hover:text-gray-700"
+                className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Select a document to chat about
             </p>
           </div>
@@ -219,16 +221,16 @@ const Chat = () => {
           <div className="flex-1 overflow-y-auto p-4">
             {documentsLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader className="w-6 h-6 animate-spin text-blue-600" />
-                <span className="ml-2 text-sm text-gray-600">Loading...</span>
+                <div className="w-6 h-6 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">Loading...</span>
               </div>
             ) : documents.length === 0 ? (
               <div className="text-center py-8">
-                <File className="w-12 h-12 mx-auto text-gray-300 mb-2" />
-                <p className="text-sm text-gray-500">No documents uploaded</p>
+                <File className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">No documents uploaded</p>
                 <a
                   href="/upload"
-                  className="text-sm text-blue-600 hover:text-blue-700 mt-2 inline-block"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mt-2 inline-block"
                 >
                   Upload documents →
                 </a>
@@ -240,25 +242,25 @@ const Chat = () => {
                   onClick={() => handleSelectDocument(null)}
                   className={`w-full text-left p-3 rounded-lg transition-colors ${
                     selectedDocument === null
-                      ? 'bg-blue-50 border-2 border-blue-500'
-                      : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                      ? 'bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-500 dark:border-blue-400'
+                      : 'bg-gray-50 dark:bg-gray-700 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-600'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                      selectedDocument === null ? 'bg-blue-100' : 'bg-gray-200'
+                      selectedDocument === null ? 'bg-blue-100 dark:bg-blue-800' : 'bg-gray-200 dark:bg-gray-600'
                     }`}>
                       <File className={`w-5 h-5 ${
-                        selectedDocument === null ? 'text-blue-600' : 'text-gray-600'
+                        selectedDocument === null ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'
                       }`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`font-medium truncate ${
-                        selectedDocument === null ? 'text-blue-900' : 'text-gray-900'
+                        selectedDocument === null ? 'text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-gray-100'
                       }`}>
                         All Documents
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {documents.length} document{documents.length !== 1 ? 's' : ''}
                       </p>
                     </div>
@@ -271,8 +273,8 @@ const Chat = () => {
                     key={doc.id}
                     className={`relative group p-3 rounded-lg transition-colors ${
                       selectedDocument === doc.id
-                        ? 'bg-blue-50 border-2 border-blue-500'
-                        : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-500 dark:border-blue-400'
+                        : 'bg-gray-50 dark:bg-gray-700 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-600'
                     }`}
                   >
                     <button
@@ -281,19 +283,19 @@ const Chat = () => {
                     >
                       <div className="flex items-center gap-3">
                         <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                          selectedDocument === doc.id ? 'bg-blue-100' : 'bg-white'
+                          selectedDocument === doc.id ? 'bg-blue-100 dark:bg-blue-800' : 'bg-white dark:bg-gray-600'
                         }`}>
                           <File className={`w-5 h-5 ${
-                            selectedDocument === doc.id ? 'text-blue-600' : 'text-gray-600'
+                            selectedDocument === doc.id ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'
                           }`} />
                         </div>
                         <div className="flex-1 min-w-0 pr-8">
                           <p className={`font-medium truncate ${
-                            selectedDocument === doc.id ? 'text-blue-900' : 'text-gray-900'
+                            selectedDocument === doc.id ? 'text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-gray-100'
                           }`}>
                             {doc.filename}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(doc.uploaded_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -306,7 +308,7 @@ const Chat = () => {
                         e.stopPropagation();
                         handleDeleteDocument(doc.id, doc.filename);
                       }}
-                      className="absolute top-3 right-3 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      className="absolute top-3 right-3 p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                       title="Delete document"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -314,7 +316,7 @@ const Chat = () => {
 
                     {/* Active Indicator */}
                     {selectedDocument === doc.id && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 rounded-r"></div>
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 dark:bg-blue-400 rounded-r"></div>
                     )}
                   </div>
                 ))}
@@ -328,23 +330,23 @@ const Chat = () => {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
         <div className="mb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               {!sidebarOpen && (
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                   title="Show documents"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
               )}
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Chat with AI</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Chat with AI</h1>
                 {selectedDocument && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Chatting about:{' '}
-                    <span className="font-medium text-blue-600">
+                    <span className="font-medium text-blue-600 dark:text-blue-400">
                       {documents.find((d) => d.id === selectedDocument)?.filename}
                     </span>
                   </p>
@@ -353,17 +355,17 @@ const Chat = () => {
             </div>
             <button
               onClick={handleNewChat}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
               title="Start a new chat"
             >
               <RotateCcw className="w-4 h-4" />
-              <span className="font-medium">New Chat</span>
+              <span className="font-medium hidden sm:inline">New Chat</span>
             </button>
           </div>
 
           {/* Success Message */}
           {successMessage && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm flex items-center gap-2">
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 text-sm flex items-center gap-2">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -377,22 +379,22 @@ const Chat = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm">
               {error}
             </div>
           )}
         </div>
 
         {/* Messages Container */}
-        <div className="flex-1 bg-white rounded-lg shadow-md overflow-y-auto p-6 mb-4">
+        <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-y-auto p-6 mb-4">
           {historyLoading ? (
             <div className="flex items-center justify-center h-full">
-              <Loader className="w-8 h-8 animate-spin text-blue-600" />
-              <span className="ml-3 text-gray-600">Loading chat history...</span>
+              <div className="w-8 h-8 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-3 text-gray-600 dark:text-gray-300">Loading chat history...</span>
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <Bot className="w-16 h-16 mb-4 text-gray-300" />
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+              <Bot className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600" />
               <p className="text-lg">Start a conversation with the AI assistant</p>
               <p className="text-sm mt-2">
                 {selectedDocument
@@ -408,7 +410,7 @@ const Chat = () => {
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`flex gap-3 max-w-[80%] ${
+                    className={`flex gap-3 max-w-[85%] md:max-w-[80%] ${
                       message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                     }`}
                   >
@@ -416,10 +418,10 @@ const Chat = () => {
                     <div
                       className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                         message.role === 'user'
-                          ? 'bg-blue-600'
+                          ? 'bg-blue-600 dark:bg-blue-500'
                           : message.error
-                          ? 'bg-red-500'
-                          : 'bg-gray-600'
+                          ? 'bg-red-500 dark:bg-red-600'
+                          : 'bg-gray-600 dark:bg-gray-700'
                       }`}
                     >
                       {message.role === 'user' ? (
@@ -430,41 +432,18 @@ const Chat = () => {
                     </div>
 
                     {/* Message Bubble */}
-                    <div
-                      className={`rounded-lg p-4 ${
-                        message.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : message.error
-                          ? 'bg-red-50 text-red-900 border border-red-200'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                      <p
-                        className={`text-xs mt-2 ${
-                          message.role === 'user'
-                            ? 'text-blue-200'
-                            : message.error
-                            ? 'text-red-600'
-                            : 'text-gray-500'
-                        }`}
-                      >
-                        {new Date(message.timestamp).toLocaleTimeString()}
-                      </p>
-                    </div>
+                    <MessageBubble message={message} isUser={message.role === 'user'} />
                   </div>
                 </div>
               ))}
               
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="flex gap-3 max-w-[80%]">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-600 dark:bg-gray-700 flex items-center justify-center">
                       <Bot className="w-5 h-5 text-white" />
                     </div>
-                    <div className="bg-gray-100 rounded-lg p-4">
-                      <Loader className="w-5 h-5 animate-spin text-gray-600" />
-                    </div>
+                    <TypingIndicator />
                   </div>
                 </div>
               )}
@@ -475,14 +454,14 @@ const Chat = () => {
         </div>
 
         {/* Input Form */}
-        <form onSubmit={handleSendMessage} className="bg-white rounded-lg shadow-md p-4">
+        <form onSubmit={handleSendMessage} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
           <div className="flex gap-3">
             <textarea
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-none placeholder-gray-500 dark:placeholder-gray-400"
               rows="2"
               disabled={isLoading}
               maxLength={5000}
@@ -490,10 +469,10 @@ const Chat = () => {
             <button
               type="submit"
               disabled={!inputMessage.trim() || isLoading}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               <Send className="w-5 h-5" />
-              <span>Send</span>
+              <span className="hidden sm:inline">Send</span>
             </button>
           </div>
         </form>

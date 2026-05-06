@@ -166,11 +166,11 @@ const UploadPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Upload Documents</h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Upload Documents</h1>
 
       {/* Success Message */}
       {successMessage && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
+        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200">
           <div className="flex items-center">
             <CheckCircle className="w-5 h-5 mr-2" />
             {successMessage}
@@ -180,7 +180,7 @@ const UploadPage = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
           <div className="flex items-center">
             <AlertCircle className="w-5 h-5 mr-2" />
             {error}
@@ -193,20 +193,20 @@ const UploadPage = () => {
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
           isDragActive
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+            ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-gray-50 dark:bg-gray-800'
         }`}
       >
         <input {...getInputProps()} />
-        <Upload className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+        <Upload className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
         {isDragActive ? (
-          <p className="text-lg text-blue-600">Drop the files here...</p>
+          <p className="text-lg text-blue-600 dark:text-blue-400">Drop the files here...</p>
         ) : (
           <div>
-            <p className="text-lg text-gray-600 mb-2">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">
               Drag & drop files here, or click to select files
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Supported formats: PDF, DOC, DOCX, TXT
             </p>
           </div>
@@ -215,20 +215,20 @@ const UploadPage = () => {
 
       {/* File List */}
       {files.length > 0 && (
-        <div className="mt-6 bg-white rounded-lg shadow-md p-6">
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Files to Upload ({files.length})</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Files to Upload ({files.length})</h2>
             <div className="space-x-2">
               <button
                 onClick={clearCompleted}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
               >
                 Clear Completed
               </button>
               <button
                 onClick={uploadFiles}
                 disabled={uploading || files.every(f => f.status === 'success')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {uploading ? 'Uploading...' : 'Upload All'}
               </button>
@@ -237,28 +237,28 @@ const UploadPage = () => {
 
           <div className="space-y-3">
             {files.map((fileItem) => (
-              <div key={fileItem.id} className="border rounded-lg p-4">
+              <div key={fileItem.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-3">
-                    <File className="w-5 h-5 text-gray-500" />
+                    <File className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div>
-                      <p className="font-medium text-gray-900">{fileItem.file.name}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{fileItem.file.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {(fileItem.file.size / 1024).toFixed(2)} KB
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     {fileItem.status === 'success' && (
-                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
                     )}
                     {fileItem.status === 'error' && (
-                      <AlertCircle className="w-5 h-5 text-red-500" />
+                      <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
                     )}
                     {fileItem.status === 'pending' && (
                       <button
                         onClick={() => removeFile(fileItem.id)}
-                        className="text-gray-400 hover:text-red-600"
+                        className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -268,18 +268,18 @@ const UploadPage = () => {
 
                 {fileItem.status === 'uploading' && (
                   <div className="mt-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${fileItem.progress}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{fileItem.progress}%</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{fileItem.progress}%</p>
                   </div>
                 )}
 
                 {fileItem.status === 'error' && (
-                  <p className="text-sm text-red-600 mt-2">{fileItem.error}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-2">{fileItem.error}</p>
                 )}
               </div>
             ))}
@@ -288,34 +288,34 @@ const UploadPage = () => {
       )}
 
       {/* Uploaded Documents */}
-      <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">Uploaded Documents</h2>
+      <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Uploaded Documents</h2>
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader className="w-6 h-6 animate-spin text-blue-600" />
-            <span className="ml-2 text-gray-600">Loading documents...</span>
+            <Loader className="w-6 h-6 animate-spin text-blue-600 dark:text-blue-400" />
+            <span className="ml-2 text-gray-600 dark:text-gray-300">Loading documents...</span>
           </div>
         ) : uploadedDocs.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No documents uploaded yet</p>
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">No documents uploaded yet</p>
         ) : (
           <div className="space-y-2">
             {uploadedDocs.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+                className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <div className="flex items-center space-x-3">
-                  <File className="w-5 h-5 text-blue-600" />
+                  <File className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <div>
-                    <p className="font-medium text-gray-900">{doc.filename}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{doc.filename}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Uploaded on {new Date(doc.uploaded_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleDeleteDocument(doc.id)}
-                  className="text-gray-400 hover:text-red-600"
+                  className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
                 >
                   <X className="w-5 h-5" />
                 </button>
